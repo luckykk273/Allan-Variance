@@ -1,3 +1,5 @@
 feather-format
 matplotlib
 numpy
+numba
+scipy

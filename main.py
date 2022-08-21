@@ -1,3 +1,5 @@
+import numpy as np
+
 from allan_variance_utils import *
 import feather
 
@@ -15,6 +17,14 @@ if __name__ == '__main__':
 
     # Pass data into function
     # Note that the function only accept one axis;
-    tau_x, allan_var_x = allan_variance(data=gyro_x, f=freq)
+    # tau_x, allan_var_x = allan_variance(data=gyro_x, f=freq)
+    # allan_dev_x = np.sqrt(allan_var_x)
+    # plot_result(tau_x, allan_dev_x)
+
+    # Another version to compute Allan variance
+    allan_vars_x = allan_variance2(data=gyro_x, f=freq)
+    periods_x, allan_var_x = allan_vars_x[:, 0], allan_vars_x[:, 1]
     allan_dev_x = np.sqrt(allan_var_x)
-    plot_result(tau_x, allan_dev_x)
+    plot_result2(periods_x, allan_dev_x)
+
+
