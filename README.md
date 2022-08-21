@@ -45,6 +45,8 @@ allan_dev_x = np.sqrt(allan_var_x)
 plot_result(tau_x, allan_dev_x)
 ```
 
+![image](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x.png)
+
 ## Reference
 Most of the code refer to the [Inertial Sensor Noise Analysis Using Allan Variance](https://www.mathworks.com/help/nav/ug/inertial-sensor-noise-analysis-using-allan-variance.html) in MATLAB documentation.  
 You can just see this project as a Python version.  
