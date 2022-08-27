@@ -80,17 +80,17 @@ def plot_result(tau: np.ndarray, allan_dev: np.ndarray):
     # Plot white noise(velocity/angle random walk)
     plt.plot(tau, line_n, ls='--', label=r'$\sigma_N$')
     plt.plot(tau_n, n, 'o')
-    plt.text(tau_n, n, 'N={:.4f}'.format(n))
+    plt.text(tau_n, n, 'N={:.6f}'.format(n))
 
     # Plot rate random walk
     plt.plot(tau, line_k, ls='--', label=r'$\sigma_K$')
     plt.plot(tau_k, k, 'o')
-    plt.text(tau_k, k, 'K={:.4f}'.format(k))
+    plt.text(tau_k, k, 'K={:.6f}'.format(k))
 
     # plot bias instability
     plt.plot(tau, line_b, ls='--', label=r'$\sigma_B$')
     plt.plot(tau_b, scf_b * b, 'o')
-    plt.text(tau_b, scf_b * b, 'B={:.4f}'.format(b))
+    plt.text(tau_b, scf_b * b, 'B={:.6f}'.format(b))
 
     plt.xlabel(r'$\tau_s$')
     plt.ylabel(r'$\sigma(\tau)$')
@@ -132,8 +132,74 @@ def allan_variance(data: np.ndarray, f: int, max_clusters: int = 100):
     return tau, allan_var
 
 
+def plot_result2(periods: np.ndarray, allan_dev: np.ndarray):
+    def _linear_func(x, a, b):
+        return a * x + b
+
+    def _fit_intercept(x, y, a, tau):
+        log_x, log_y = np.log(x), np.log(y)
+        # a in range [m, m+0.001]; b in range [-Inf, Inf]
+        coefs, _ = curve_fit(_linear_func, log_x, log_y, bounds=([a, -np.inf], [a + 0.001, np.inf]))
+        poly = np.poly1d(coefs)
+        print('Fitting polynomial equation:', np.poly1d(poly))
+        y_fit = lambda x: np.exp(poly(np.log(x)))
+        return y_fit(tau), y_fit
+
+    def _predict(tau, q, wn, bi, rr, ramp):
+        A = np.array([3 / tau**2, 1 / tau, 2 * np.log(2) / np.pi, tau / 3, tau**2 / 2])
+        params = np.array([q, wn, bi, rr, ramp]) ** 2
+        return np.sqrt(A.dot(params))
+
+    # White noise(velocity/angle random walk)
+    bp_wn = np.where(periods == 10)[0][0]  # white noise break point for short.
+    wn, fit_func_wn = _fit_intercept(periods[0:bp_wn], allan_dev[0:bp_wn], -0.5, 1.0)
+    print('White noise(random walk):', wn)
+
+    # Rate random walk
+    rr, fit_func_rr = _fit_intercept(periods, allan_dev, 0.5, 3.0)
+    print('Rate random walk:', rr)
+
+    # Bias instability
+    min_dev = np.min(allan_dev)
+    argmin_dev = np.argmin(allan_dev)
+    print('Bias instability:', min_dev)
+
+    # Plot result
+    fig = plt.figure()
+
+    # Plot allan deviation
+    plt.plot(periods, allan_dev)
+
+    # Plot white noise(random walk)
+    plt.plot(periods, fit_func_wn(periods), ls='--', label=r'$\sigma_N$')
+    plt.plot(1.0, wn, 'o')
+    plt.text(1.0, wn, 'N={:.6f}'.format(wn))
+
+    # Plot rate random walk
+    plt.plot(periods, fit_func_rr(periods), ls='--', label=r'$\sigma_K$')
+    plt.plot(3.0, rr, 'o')
+    plt.text(3.0, rr, 'N={:.6f}'.format(rr))
+
+    # Plot bias instability
+    plt.plot(periods, [min_dev]*len(periods), ls='--', label=r'$\sigma_B$')
+    plt.plot(periods[argmin_dev], min_dev, 'o')
+    plt.text(periods[argmin_dev], min_dev, 'B={:.6f}'.format(min_dev))
+
+    # Plot fitted model
+    fitted_model = _predict(periods, 0, wn, min_dev, rr, 0)
+    plt.plot(periods, fitted_model, label='fitted model')
+
+    plt.xlabel(r'$\tau_s$')
+    plt.ylabel(r'$\sigma(\tau)$')
+    plt.grid(True, which='both', ls='-', color='0.65')
+    plt.legend()
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.show()
+
+
 @njit
-def allan_variance2(data: np.ndarray, f: int):
+def allan_variance2(data: np.ndarray, f: int, verbose: int = 0):
     """
     A much more intuitive understood function to compute Allan variance.
     NOTE: This function runs much slower(because this function doesn't utilize vectorization),
@@ -141,7 +207,9 @@ def allan_variance2(data: np.ndarray, f: int):
 
     :param data: 1D numpy array (unit: gyro [deg/s], accel [m/s^2])
     :param f: data sample rate [Hz]
-    :return: allan_variances: Allan variances from t0, 2t0, ..., to mto
+    :param verbose: show process of info. if verbose > 0
+    :return: allan_variances: 2D numpy array which shape is (m, 2)
+             Allan variances from t0, 2t0, ..., to mt0 with corresponding periods
     """
     allan_variances = []
     for period in range(1, 10000):
@@ -162,71 +230,17 @@ def allan_variance2(data: np.ndarray, f: int):
                 bin_size = 0
 
         num_avgs = len(avgs)
-        print('Compute', num_avgs, 'averages for period', period_time)
+
+        if verbose > 0:
+            print('Compute', num_avgs, 'averages for period', period_time)
 
         # Compute Allan variance
         allan_var = 0
         for k in range(num_avgs - 1):
             allan_var += (avgs[k + 1] - avgs[k]) ** 2
 
-        allan_var /= (2 * (num_avgs - 1))
+        allan_var /= 2 * (num_avgs - 1)
         allan_variances.append((period_time, allan_var))
 
     return np.array(allan_variances)
-
-
-def plot_result2(periods: np.ndarray, allan_dev: np.ndarray):
-    def _linear_func(x, a, b):
-        return a * x + b
-
-    def _fit_intercept(x, y, m, b):
-        log_x, log_y = np.log(x), np.log(y)
-        # m < a < m+0.001; -Inf < b < Inf
-        coefs, _ = curve_fit(_linear_func, log_x, log_y, bounds=([m, -np.inf], [m + 0.001, np.inf]))
-        poly = np.poly1d(coefs)
-        print('Fitting polynomial equation:', np.poly1d(poly))
-        y_fit = lambda value: np.exp(poly(np.log(value)))
-        return y_fit(b), y_fit
-
-    # White noise(velocity/angle random walk)
-    temp = np.where(periods == 10)
-    bp_wn = np.where(periods == 10)[0][0]  # white noise break point for short.
-    intercept_wn, fit_func_wn = _fit_intercept(periods[0:bp_wn], allan_dev[0:bp_wn], -0.5, 1.0)
-    print('White noise(random walk):', intercept_wn, r'$\frac{m}{s}\frac{1}\{sqrt{Hz}}$')
-
-    # Rate random walk
-    intercept_rr, fit_func_rr = _fit_intercept(periods, allan_dev, 0.5, 3.0)
-    print('Rate random walk:', intercept_rr, r'$\frac{m}{s^2}\frac{1}\{sqrt{Hz}}$')
-
-    # Bias instability
-    min_dev = np.min(allan_dev)
-    argmin_dev = np.argmin(allan_dev)
-    print('Bias instability:', min_dev, r'$\frac{m}{s^2}$')
-
-    # Plot result
-    fig = plt.figure()
-
-    # Plot allan deviation
-    plt.plot(periods, allan_dev)
-
-    # Plot white noise(random walk)
-    plt.plot(periods, fit_func_wn(periods))
-    plt.plot(1.0, intercept_wn)
-
-    # Plot rate random walk
-    plt.plot(periods, fit_func_rr(periods))
-    plt.plot(1.0, intercept_rr)
-
-    # Plot bias instability
-    plt.plot(periods[argmin_dev], min_dev)
-
-    plt.xlabel(r'$\tau_s$')
-    plt.ylabel(r'$\sigma(\tau)$')
-    plt.grid(True, which='both', ls='-', color='0.65')
-    plt.legend()
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.show()
-
-
 
