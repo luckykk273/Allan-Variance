@@ -52,21 +52,8 @@ allan_dev_x = np.sqrt(allan_var_x)
 plot_result2(periods_x, allan_dev_x)
 ```
 
-![image](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x.png)
-
-## Reference
-### Theory
-1. [Wiki - Allan Variance](https://en.wikipedia.org/wiki/Allan_variance)  
-2. [N. El-Sheimy, H. Hou and X. Niu, "Analysis and Modeling of Inertial Sensors Using Allan Variance," in IEEE Transactions on Instrumentation and Measurement, vol. 57, no. 1, pp. 140-149, Jan. 2008, doi: 10.1109/TIM.2007.908635.](https://ieeexplore.ieee.org/document/4404126)  
-3. ["IEEE Standard Specification Format Guide and Test Procedure for Single-Axis Laser Gyros," in IEEE Std 647-2006 (Revision of IEEE Std 647-1995) , vol., no., pp.1-96, 18 Sept. 2006, doi: 10.1109/IEEESTD.2006.246241.](https://ieeexplore.ieee.org/document/1706054)  
-4. [Pupo, Leslie Barreda. “Characterization of errors and noises in MEMS inertial sensors using Allan variance method.” (2016).](https://www.semanticscholar.org/paper/Characterization-of-errors-and-noises-in-MEMS-using-Pupo/b8d4eaa1ed06274534ebe843b2e5c881ac380dd9)  
-5. [Introduction to Allan Variance—Non-overlapping and Overlapping Allan Variance](https://www.allaboutcircuits.com/technical-articles/intro-to-allan-variance-analysis-non-overlapping-and-overlapping-allan-variance/)
-
-If someone is a newbie to IMU or Allan variance(or maybe you are confused about terms mentioned in this project), please refer to the [Introduction to Simulating IMU Measurements](https://www.mathworks.com/help/nav/ug/introduction-to-simulating-imu-measurements.html).
-
-### Implementation
-- [Inertial Sensor Noise Analysis Using Allan Variance](https://www.mathworks.com/help/nav/ug/inertial-sensor-noise-analysis-using-allan-variance.html) in MATLAB documentation.  
-- [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros)  
+![version1](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x.png)
+![version2](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x2.png)
 
 NOTE:  
 When you compare the results got from these two versions, you will find slightly different between them because **different data range are used** when fitting the line.  
@@ -102,6 +89,19 @@ bp_wn = np.where(periods == 10)[0][0]  # white noise break point for short.
 wn, fit_func_wn = _fit_intercept(periods[0:bp_wn], allan_dev[0:bp_wn], -0.5, 1.0)
 ```
 
+## Reference
+### Theory
+1. [Wiki - Allan Variance](https://en.wikipedia.org/wiki/Allan_variance)  
+2. [N. El-Sheimy, H. Hou and X. Niu, "Analysis and Modeling of Inertial Sensors Using Allan Variance," in IEEE Transactions on Instrumentation and Measurement, vol. 57, no. 1, pp. 140-149, Jan. 2008, doi: 10.1109/TIM.2007.908635.](https://ieeexplore.ieee.org/document/4404126)  
+3. ["IEEE Standard Specification Format Guide and Test Procedure for Single-Axis Laser Gyros," in IEEE Std 647-2006 (Revision of IEEE Std 647-1995) , vol., no., pp.1-96, 18 Sept. 2006, doi: 10.1109/IEEESTD.2006.246241.](https://ieeexplore.ieee.org/document/1706054)  
+4. [Pupo, Leslie Barreda. “Characterization of errors and noises in MEMS inertial sensors using Allan variance method.” (2016).](https://www.semanticscholar.org/paper/Characterization-of-errors-and-noises-in-MEMS-using-Pupo/b8d4eaa1ed06274534ebe843b2e5c881ac380dd9)  
+5. [Introduction to Allan Variance—Non-overlapping and Overlapping Allan Variance](https://www.allaboutcircuits.com/technical-articles/intro-to-allan-variance-analysis-non-overlapping-and-overlapping-allan-variance/)
+
+If someone is a newbie to IMU or Allan variance(or maybe you are confused about terms mentioned in this project), please refer to the [Introduction to Simulating IMU Measurements](https://www.mathworks.com/help/nav/ug/introduction-to-simulating-imu-measurements.html).
+
+### Implementation
+- [Inertial Sensor Noise Analysis Using Allan Variance](https://www.mathworks.com/help/nav/ug/inertial-sensor-noise-analysis-using-allan-variance.html) in MATLAB documentation.  
+- [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros)  
 
 ## Contact
 Welcome to contact me for any further question, below is my gmail address:  

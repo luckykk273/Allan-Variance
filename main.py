@@ -15,9 +15,9 @@ if __name__ == '__main__':
 
     # Pass data into function
     # Note that the function only accept one axis;
-    # tau_x, allan_var_x = allan_variance(data=gyro_x, f=freq, max_clusters=200)
-    # allan_dev_x = np.sqrt(allan_var_x)
-    # plot_result(tau_x, allan_dev_x)
+    tau_x, allan_var_x = allan_variance(data=gyro_x, f=freq, max_clusters=200)
+    allan_dev_x = np.sqrt(allan_var_x)
+    plot_result(tau_x, allan_dev_x)
 
     # Another version to compute Allan variance
     allan_vars_x = allan_variance2(data=gyro_x, f=freq)
