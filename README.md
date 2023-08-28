@@ -103,6 +103,9 @@ If someone is a newbie to IMU or Allan variance(or maybe you are confused about 
 - [Inertial Sensor Noise Analysis Using Allan Variance](https://www.mathworks.com/help/nav/ug/inertial-sensor-noise-analysis-using-allan-variance.html) in MATLAB documentation.  
 - [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros)  
 
+## TODO
+Add IMU simulation function to generate noised signal for testing
+
 ## Contact
 Welcome to contact me for any further question, below is my gmail address:  
 luckykk273@gmail.com
