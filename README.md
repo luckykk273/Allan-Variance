@@ -2,7 +2,7 @@
 Implement two versions for calculating Allan Variance, with some mathematical comments. The first version is implemented based on MATLAB documentation; the second version is a reimplementation of [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros) in Python. Both two versions have been tested, and their output match the respective reference implementations.
 
 ## Preface
-When doing noise analysis for inertial measurement unit(IMU), Allan variance is one of the most useful methods. There are some libraries wrote in MATLAB, Python, or C++. Most of these libraries doesn't build bridge between theory and implementation of code. This project's aims to give some intuitive explanation for some part of code when computing Allan variance.  
+When doing noise analysis for inertial measurement unit(IMU), Allan variance is one of the most useful methods. There are some libraries wrote in MATLAB, Python, or C++. Most of these libraries doesn't build the bridge between the theory and the implementation of code. This repository aims to provide some intuitive explanation for some part of code when computing Allan variance.  
 
 ## Data
 Inertial sensor noise analysis are suggested to keep sensor static for at least **3hrs**. The example data are too large to upload to GitHub(though the file has been compressed). And there are some technical problems to upload data with Git Large File Storage. Please go to the url provided to download the [IMU data](https://drive.google.com/file/d/1W6b9GrQ47dlNgfJLtvdxJ0_yoMjOvydz/view?usp=sharing).
