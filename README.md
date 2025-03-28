@@ -1,29 +1,20 @@
 # Allan Variance
+Implement two versions for calculating Allan Variance, with some mathematical comments. The first version is implemented based on MATLAB documentation; the second version is a reimplementation of [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros) in Python. Both two versions have been tested, and their output match the respective reference implementations.
 
 ## Preface
-When doing noise analysis for inertial measurement unit(IMU), 
-Allan variance is one of the most useful methods.  
-There are some libraries wrote in MATLAB, Python, or C++.  
-Most of these libraries doesn't build bridge between theory and implementation of code.  
-This project's aims to give some intuitive explanation for some part of code when computing Allan variance.
-
+When doing noise analysis for inertial measurement unit(IMU), Allan variance is one of the most useful methods. There are some libraries wrote in MATLAB, Python, or C++. Most of these libraries doesn't build bridge between theory and implementation of code. This project's aims to give some intuitive explanation for some part of code when computing Allan variance.  
 
 ## Data
-Inertial sensor noise analysis are suggested to keep sensor static for at least **3hrs**.
-The example data are too large to upload to GitHub(though the file has been compressed).
-And there are some technical problems to upload data with Git Large File Storage.
-Please go to the url below to download the data:  
-[IMU data](https://drive.google.com/file/d/1W6b9GrQ47dlNgfJLtvdxJ0_yoMjOvydz/view?usp=sharing)
+Inertial sensor noise analysis are suggested to keep sensor static for at least **3hrs**. The example data are too large to upload to GitHub(though the file has been compressed). And there are some technical problems to upload data with Git Large File Storage. Please go to the url provided to download the [IMU data](https://drive.google.com/file/d/1W6b9GrQ47dlNgfJLtvdxJ0_yoMjOvydz/view?usp=sharing).
 
 ## Requirement
-All requirement packages are listed in requirements.txt.  
-Please go to the directory where the repository clone and type the command below to install the necessary libraries:  
-```pip install -r requirements.txt```
+All required packages are listed in `requirements.txt`. Please install the necessary libraries with the command:  
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
-Feel free to load the IMU data collected yourself and pass into the function.  
-(Note that the function only accept one axis)  
-In main.py, there is an easy example to follow: 
+Feel free to load the IMU data collected yourself and pass into the function(both two versions accept only one axis of data). In `main.py`, there is a simple example to follow: 
 ```Python
 import feather
 from allan_variance_utils import *
@@ -55,10 +46,9 @@ plot_result2(periods_x, allan_dev_x)
 ![version1](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x.png)
 ![version2](https://github.com/luckykk273/Allan-Variance/blob/main/example_gyro_x2.png)
 
-NOTE:  
-When you compare the results got from these two versions, you will find slightly different between them because **different data range are used** when fitting the line.  
-For instance, when find out white noise:  
-In version 1, slopes are computed at all tau and find the index that are most closed to -0.5;
+NOTE: When you compare the results got from these two versions, you will find slightly different between them because **different data range are used** when fitting the line. For instance, when finding out white noise:  
+
+In version 1, slopes are computed at all tau and it finds the index most closed to -0.5:
 ```Python
 log_tau = np.log10(tau)
 log_allan_dev = np.log10(allan_dev)
@@ -70,7 +60,7 @@ argmin_abs_i = np.argmin(np.abs(dlog_allan_dev - slope_arw))  # index that are m
 # Find the y-intercept of the line
 intercept = log_allan_dev[argmin_abs_i] - slope_arw * log_tau[argmin_abs_i]
 ```
-In version 2, it fits data from beginning to where periods equal to 10.
+In version 2, it fits data from the beginning to where periods equal to 10:
 ```Python
 def _linear_func(x, a, b):
     return a * x + b
@@ -97,15 +87,12 @@ wn, fit_func_wn = _fit_intercept(periods[0:bp_wn], allan_dev[0:bp_wn], -0.5, 1.0
 4. [Pupo, Leslie Barreda. “Characterization of errors and noises in MEMS inertial sensors using Allan variance method.” (2016).](https://www.semanticscholar.org/paper/Characterization-of-errors-and-noises-in-MEMS-using-Pupo/b8d4eaa1ed06274534ebe843b2e5c881ac380dd9)  
 5. [Introduction to Allan Variance—Non-overlapping and Overlapping Allan Variance](https://www.allaboutcircuits.com/technical-articles/intro-to-allan-variance-analysis-non-overlapping-and-overlapping-allan-variance/)
 
-If someone is a newbie to IMU or Allan variance(or maybe you are confused about terms mentioned in this project), please refer to the [Introduction to Simulating IMU Measurements](https://www.mathworks.com/help/nav/ug/introduction-to-simulating-imu-measurements.html).
+If someone is a newbie to IMU or Allan variance(or maybe you are confused about terms mentioned in this repository), please refer to the [Introduction to Simulating IMU Measurements](https://www.mathworks.com/help/nav/ug/introduction-to-simulating-imu-measurements.html).
 
 ### Implementation
 - [Inertial Sensor Noise Analysis Using Allan Variance](https://www.mathworks.com/help/nav/ug/inertial-sensor-noise-analysis-using-allan-variance.html) in MATLAB documentation.  
 - [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros)  
 
-## TODO
-Add IMU simulation function to generate noised signal for testing
-
 ## Contact
-Welcome to contact me for any further question, below is my gmail address:  
+Welcome to contact me for any further question through my email:  
 luckykk273@gmail.com
